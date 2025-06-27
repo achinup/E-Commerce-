@@ -48,11 +48,10 @@ public class ProductService {
                 .filter(product -> product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
                 .toList();
     }
-
-    public Product getProductByPriceProducts(double price) {
+    public List<Product> getProductsByCategory(String category) {
         return productRepository.findAll().stream()
-                .filter(product -> product.getPrice() == price)
-                .findFirst()
-                .orElse(null);
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .toList();
     }
+
 }

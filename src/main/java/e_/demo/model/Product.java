@@ -1,16 +1,29 @@
 package e_.demo.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Document(collection = "products")
 public class Product {
+    @Id
+    private String id;
+    private String name;
+    private String description;
+    private String category;
+    private Double price;
+
+    public Product() {}
+
+    public Product(String id, String name, String description, String category, Double price) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.price = price;
+    }
+
+    // Getters and setters
+
     public String getId() {
         return id;
     }
@@ -50,11 +63,4 @@ public class Product {
     public void setPrice(Double price) {
         this.price = price;
     }
-
-    @Id
-    private String id;
-    private String name;
-    private String description;
-    private String category;
-    private Double price;
 }

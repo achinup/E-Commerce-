@@ -46,11 +46,12 @@ public class ProductController {
     public List<Product> getProductsByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
         return productService.getProductsByPriceRange(minPrice, maxPrice);
     }
-    @GetMapping("/price-products")
-    public Product getProductByPriceProducts(@RequestParam double price) {
-
-        return productService.getProductByPriceProducts(price);
-        }
+    @GetMapping("/category/{category}")
+    public List<Product> getProductsByCategory(@PathVariable String category) {
+        return productService.getAllProducts().stream()
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                .toList();
+    }
 
 
 
