@@ -2,12 +2,15 @@
 package e_.demo.controller;
 
 import e_.demo.model.Product;
+import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,8 +23,33 @@ class ProductControllerIntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+
     @Test
-    void testCreateProduct() {
+    void test_Get_All_Products(){
+        String url="http://localhost:"+port+"/api/products";
+
+        ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().length).isGreaterThan(0);
+
+    }
+
+    @Test
+    void test_Get_Product_By_Id(){
+        String url="http://localhost:"+port+"/api/products/685fb0fb523a9e812bd4a949";
+
+        ResponseEntity<Product> response=restTemplate.getForEntity(url,Product.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getId()).isEqualTo("685fb0fb523a9e812bd4a949");
+
+    }
+
+    @Test
+    void test_Post_Product() {
         String url = "http://localhost:"+port+ "/api/products";
         Product product = new Product(null, "Iphone", "A high-performance laptop", "Electronics", 20000.00);
 
@@ -34,6 +62,41 @@ class ProductControllerIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getName()).isEqualTo("Laptop");
+        assertThat(response.getBody().getName()).isEqualTo("Iphone");
     }
+
+    @Test
+    void test_Put_Product_By_Id(){
+        String id="685fb0fb523a9e812bd4a949";
+        String url="http://localhost:"+port+"/api/products/"+id;
+        Product product=new Product(id,"Iphone","A high-performance laptop","Electronics",25000.00);
+
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Product> request=new HttpEntity<>(product,headers);
+
+        ResponseEntity<Product> response=restTemplate.exchange(url,HttpMethod.PUT,request,Product.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getPrice()).isEqualTo(25000.00);
+    }
+
+    @Test
+    void test_Delete_Product_By_Id(){
+        String id="685fb887a5b443fe22193c21";
+        String url="http://localhost:"+port+"/api/products/"+id;
+
+        ResponseEntity<Product> response=restTemplate.exchange(url,HttpMethod.DELETE,HttpEntity.EMPTY,Product.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    }
+
+
+
+
+
+
 }
