@@ -51,10 +51,6 @@ public class ProductService {
                 .filter(product -> product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
                 .toList();
     }
-    public List<Product> getProductsByCategory(String category) {
-        return productRepository.findAll().stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .toList();
-    }
+
 
 }
