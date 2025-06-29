@@ -3,7 +3,6 @@ package e_.demo.controller;
 import e_.demo.model.Product;
 import e_.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
