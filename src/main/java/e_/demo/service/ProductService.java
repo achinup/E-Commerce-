@@ -5,6 +5,7 @@ import e_.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,8 @@ public class ProductService {
     private ProductRepository productRepository;
 
 
-    public List<Product> getAllProducts() {
-        Page<Product> page=productRepository.findAll(PageRequest.of(
-                0,3, Sort.by(new Sort.Order(Sort.Direction.ASC,"price"))
-        ));
+    public List<Product> getAllProducts(Pageable pageable) {
+        Page<Product> page=productRepository.findAll(pageable);
         return page.getContent();
     }
 

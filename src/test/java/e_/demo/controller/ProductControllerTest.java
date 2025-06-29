@@ -18,29 +18,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductControllerIntegrationTest {
 
-    @LocalServerPort
-    private int port;
-
     @Autowired
     private TestRestTemplate restTemplate;
 
 
     @Test
     void test_Get_All_Products(){
-        String url="http://localhost:"+port+"/api/products";
+
+        String url= "/api/products?page=1&size=4&sort=price,asc";
 
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().length).isEqualTo(3);
+        assertThat(response.getBody().length).isEqualTo(4);
         assertThat(Arrays.stream(response.getBody()).findFirst().get().getPrice()).isEqualTo(250);
 
     }
 
     @Test
     void test_Get_Product_By_Id(){
-        String url="http://localhost:"+port+"/api/products/685fb0fb523a9e812bd4a949";
+        String url="/api/products/685fb0fb523a9e812bd4a949";
 
         ResponseEntity<Product> response=restTemplate.getForEntity(url,Product.class);
 
@@ -52,13 +50,10 @@ class ProductControllerIntegrationTest {
 
     @Test
     void test_Post_Product() {
-        String url = "http://localhost:"+port+ "/api/products";
+        String url = "/api/products";
         Product product = new Product(null, "Apple", "So sweet", "Fruit", 250.00);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Product> request = new HttpEntity<>(product, headers);
+        HttpEntity<Product> request = getProductHttpEntity(product);
 
         ResponseEntity<Product> response = restTemplate.postForEntity(url, request, Product.class);
 
@@ -70,13 +65,10 @@ class ProductControllerIntegrationTest {
     @Test
     void test_Put_Product_By_Id(){
         String id="685fb0fb523a9e812bd4a949";
-        String url="http://localhost:"+port+"/api/products/"+id;
+        String url="/api/products/"+id;
         Product product=new Product(id,"Iphone","A high-performance laptop","Electronics",25000.00);
 
-        HttpHeaders headers=new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Product> request=new HttpEntity<>(product,headers);
+        HttpEntity<Product> request = getProductHttpEntity(product);
 
         ResponseEntity<Product> response=restTemplate.exchange(url,HttpMethod.PUT,request,Product.class);
 
@@ -85,10 +77,11 @@ class ProductControllerIntegrationTest {
         assertThat(response.getBody().getPrice()).isEqualTo(25000.00);
     }
 
+
     @Test
     void test_Delete_Product_By_Id(){
         String id="685fb887a5b443fe22193c21";
-        String url="http://localhost:"+port+"/api/products/"+id;
+        String url="/api/products/"+id;
 
         ResponseEntity<Product> response=restTemplate.exchange(url,HttpMethod.DELETE,HttpEntity.EMPTY,Product.class);
 
@@ -98,7 +91,7 @@ class ProductControllerIntegrationTest {
 
     @Test
     void test_Serch_Product_By_Name(){
-        String url="http://localhost:"+port+"/api/products/search?name=ThinkPad";
+        String url="/api/products/search?name=ThinkPad";
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -108,7 +101,7 @@ class ProductControllerIntegrationTest {
 
     @Test
     void test_Get_Product_By_Range(){
-        String url="http://localhost:"+port+"/api/products/price-range?minPrice=1000&maxPrice=20000";
+        String url="/api/products/price-range?minPrice=1000&maxPrice=20000";
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -117,11 +110,23 @@ class ProductControllerIntegrationTest {
 
     @Test
     void test_Get_Product_By_Category(){
-        String url="http://localhost:"+port+"/api/products/category/Fruit";
+        String url="/api/products/category/Fruit";
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Arrays.stream(response.getBody()).findFirst().get().getName()).isEqualTo("Apple");
+    }
+
+
+
+
+
+    private static HttpEntity<Product> getProductHttpEntity(Product product) {
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Product> request=new HttpEntity<>(product,headers);
+        return request;
     }
 
 
