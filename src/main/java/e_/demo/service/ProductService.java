@@ -3,6 +3,9 @@ package e_.demo.service;
 import e_.demo.model.Product;
 import e_.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +17,10 @@ public class ProductService {
 
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        Page<Product> page=productRepository.findAll(PageRequest.of(
+                0,3, Sort.by(new Sort.Order(Sort.Direction.ASC,"price"))
+        ));
+        return page.getContent();
     }
 
     public Product getProductById(String id) {

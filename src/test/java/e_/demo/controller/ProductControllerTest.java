@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,8 @@ class ProductControllerIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().length).isGreaterThan(0);
+        assertThat(response.getBody().length).isEqualTo(3);
+        assertThat(Arrays.stream(response.getBody()).findFirst().get().getPrice()).isEqualTo(250);
 
     }
 
@@ -51,7 +53,7 @@ class ProductControllerIntegrationTest {
     @Test
     void test_Post_Product() {
         String url = "http://localhost:"+port+ "/api/products";
-        Product product = new Product(null, "Iphone", "A high-performance laptop", "Electronics", 20000.00);
+        Product product = new Product(null, "Apple", "So sweet", "Fruit", 250.00);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -62,7 +64,7 @@ class ProductControllerIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getName()).isEqualTo("Iphone");
+        assertThat(response.getBody().getName()).isEqualTo("Apple");
     }
 
     @Test
@@ -92,6 +94,34 @@ class ProductControllerIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+    }
+
+    @Test
+    void test_Serch_Product_By_Name(){
+        String url="http://localhost:"+port+"/api/products/search?name=ThinkPad";
+        ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().length).isEqualTo(2);
+
+    }
+
+    @Test
+    void test_Get_Product_By_Range(){
+        String url="http://localhost:"+port+"/api/products/price-range?minPrice=1000&maxPrice=20000";
+        ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().length).isEqualTo(3);
+    }
+
+    @Test
+    void test_Get_Product_By_Category(){
+        String url="http://localhost:"+port+"/api/products/category/Fruit";
+        ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Arrays.stream(response.getBody()).findFirst().get().getName()).isEqualTo("Apple");
     }
 
 
