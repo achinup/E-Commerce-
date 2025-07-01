@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.PrimitiveIterator;
+
 @Service
 public class ProductService {
 
@@ -21,10 +23,12 @@ public class ProductService {
     }
 
     public Product getProductById(String id) {
+
         return productRepository.findById(id).orElse(null);
     }
 
     public Product createProduct(Product product) {
+
         return productRepository.save(product);
     }
 
@@ -37,11 +41,12 @@ public class ProductService {
     }
 
     public void deleteProduct(String id) {
+
         productRepository.deleteById(id);
     }
 
-    public List<Product> searchProducts(String name) {
-        return productRepository.findAll().stream()
+    public List<Product> searchProducts(String name,Pageable pageable) {
+        return productRepository.findAll(pageable).stream()
                 .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
     }
@@ -49,6 +54,12 @@ public class ProductService {
     public List<Product> getProductsByPriceRange(double minPrice, double maxPrice) {
         return productRepository.findAll().stream()
                 .filter(product -> product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
+                .toList();
+    }
+
+    public  List<Product> getProductByCategory(String category,Pageable pageable){
+        return getAllProducts(pageable).stream()
+                .filter(product -> product.getCategory().equalsIgnoreCase(category))
                 .toList();
     }
 

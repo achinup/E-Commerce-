@@ -39,19 +39,18 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<Product> searchProducts(@RequestParam String name) {
-        return productService.searchProducts(name);
+    public List<Product> searchProducts(@RequestParam String name,Pageable pageable) {
+        return productService.searchProducts(name,pageable);
     }
 
     @GetMapping("/price-range")
     public List<Product> getProductsByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
         return productService.getProductsByPriceRange(minPrice, maxPrice);
     }
+
     @GetMapping("/category/{category}")
     public List<Product> getProductsByCategory(@PathVariable String category,Pageable pageable) {
-        return productService.getAllProducts(pageable).stream()
-                .filter(product -> product.getCategory().equalsIgnoreCase(category))
-                .toList();
+        return productService.getProductByCategory(category,pageable);
     }
 
 

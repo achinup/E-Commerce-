@@ -21,7 +21,7 @@ class ProductControllerIntegrationTest {
     @Test
     void test_Get_All_Products(){
 
-        String url= "/api/products?page=1&size=4&sort=price,asc";
+        String url= "/api/products?page=0&size=4&sort=price,asc";
 
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
@@ -36,18 +36,18 @@ class ProductControllerIntegrationTest {
     void test_Get_Product_By_Id(){
         String url="/api/products/685fb0fb523a9e812bd4a949";
 
-        ResponseEntity<Product> response=restTemplate.getForEntity(url,Product.class);
+        ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getId()).isEqualTo("685fb0fb523a9e812bd4a949");
+        assertThat(response.getBody()[0].getId()).isEqualTo("685fb0fb523a9e812bd4a949");
 
     }
 
     @Test
     void test_Post_Product() {
         String url = "/api/products";
-        Product product = new Product(null, "Apple", "So sweet", "Fruit", 250.00);
+        Product product = new Product(null, "Apple", "So sweet", "Fruit", 258.00);
 
         HttpEntity<Product> request = getProductHttpEntity(product);
 
@@ -101,19 +101,46 @@ class ProductControllerIntegrationTest {
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().length).isEqualTo(3);
+        assertThat(response.getBody().length).isEqualTo(4);
     }
 
     @Test
     void test_Get_Product_By_Category(){
-        String url="/api/products/category/Fruit";
+        String url="/api/products/category/Fruit?page=0&size=2&sort=price,asc";
         ResponseEntity<Product[]> response=restTemplate.getForEntity(url,Product[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Arrays.stream(response.getBody()).findFirst().get().getName()).isEqualTo("Apple");
+        assertThat(response.getBody().length).isEqualTo(2);
     }
 
 
+    @Test
+    void testQuery_GetAllProducts() {
+        // Plain text query that should result in the same endpoint call
+        String userQuery = "Give me all products sorted by price ascending with page 0 and size 4";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(userQuery, headers);
+
+        ResponseEntity<Product[]> response = restTemplate.exchange(
+                "/api/query",
+                HttpMethod.POST,
+                requestEntity,
+                Product[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
+        // Validate that we got 4 products as expected
+        assertThat(response.getBody().length).isEqualTo(4);
+
+        // Optional: assert on product details, e.g., price of first product
+        Product firstProduct = Arrays.stream(response.getBody()).findFirst().get();
+        assertThat(firstProduct.getPrice()).isEqualTo(250);
+    }
 
 
 
