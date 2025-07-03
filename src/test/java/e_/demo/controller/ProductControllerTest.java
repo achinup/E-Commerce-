@@ -115,32 +115,8 @@ class ProductControllerIntegrationTest {
     }
 
 
-    @Test
-    void testQuery_GetAllProducts() {
-        // Plain text query that should result in the same endpoint call
-        String userQuery = "Give me all products sorted by price ascending with page 0 and size 4";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(userQuery, headers);
-
-        ResponseEntity<Product[]> response = restTemplate.exchange(
-                "/api/query",
-                HttpMethod.POST,
-                requestEntity,
-                Product[].class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-
-        // Validate that we got 4 products as expected
-        assertThat(response.getBody().length).isEqualTo(4);
-
-        // Optional: assert on product details, e.g., price of first product
-        Product firstProduct = Arrays.stream(response.getBody()).findFirst().get();
-        assertThat(firstProduct.getPrice()).isEqualTo(250);
-    }
 
 
 

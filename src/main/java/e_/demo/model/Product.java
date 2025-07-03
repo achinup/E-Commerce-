@@ -7,9 +7,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "products")
-@Data // generates getters, setters, toString, equals, hashCode
-@NoArgsConstructor // generates a no-arg constructor
-@AllArgsConstructor // generates an all-args constructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     @Id
     private String id;
